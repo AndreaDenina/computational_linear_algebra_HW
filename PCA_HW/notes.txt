@@ -1,0 +1,58 @@
+The weak point to defend: Smoking. "Tried" vs "former" is not clearly ordered. 
+Read the scale as "how much someone has smoked" (never < tried < quit after real smoking < still smokes). 
+Say in your text that this is an assumption. 
+If the teacher pushes on it, one-hot for Smoking only is the alternative, and you can explain the trade-off above.
+
+Direction and spacing. Equal steps (1, 2, 3) are an assumption too. 
+The direction only flips the sign of that feature's loadings, (The direction of the ordering)
+but you'll need it when you name the components in Exercise 3. 
+So pick "higher = more of the thing" and write it down.
+
+The standard scaler generates some drawbacks, in particular features with high variance get compressed and those with low variance get stecthed.
+
+Almost everyone (82%) answered 5 to Music, so the question tells you very little about how people differ. After scaling, though:
+
+One point means different things.
+One point on the Music scale is worth 1.61 units, while one point on Pets is worth only 0.64. 
+A small difference in Music now counts about 2.5 times more than the same difference in Pets.
+
+A few answers become extreme values.
+The 3 people who answered 1 to Music get −6.03, a value far bigger than anything Pets can produce.
+
+The noise gets amplified too. (Not really a problem)
+Whether someone answers 4 or 5 to "I enjoy music" may depend more on their mood that day than on who they are. 
+The scaler can't tell real information from noise; 
+it just raises every feature to variance 1.
+
+
+The variance that carried information is gone. 
+Before scaling, a high variance meant "this question splits people into groups", which is exactly what you want for profiling customers. 
+After scaling, every question has variance 1, so that information is lost.
+
+The PCA has a harder time compressing. The total variance is spread evenly over 93 features, so each PC explains less. 
+The cumulative curve rises more slowly than for responses_ft_enc.
+
+Rare answers can pull the PCs. Extreme values like −6 have a large effect on variances and covariances,
+so a handful of people can influence the direction of some PCs.
+
+
+Why scale anyway? In this dataset almost every feature is already on the same 1–5 scale. So the usual reason for standardizing,
+features measured in different units like kg and cm, is weak here. The real reasons are:
+
+- the 3 categorical features have a different range (1–3 or 1–4);
+- without scaling, a few high-variance features would dominate the PCs;
+- with scaling, the PCs reflect correlations between questions rather than how widely each question was answered.
+
+Without scaling the PCA finds principal components that describe the questions with sparser answers 
+instead we want to find correlations between the features
+in order to highlight relations. 
+
+**Pros.** Standard scaling gives every feature the same weight, so the PCA works on the correlation matrix: 
+each PC with variance above 1 comes only from groups of correlated questions, 
+which is what we need to identify profiles. It also prevents high-variance features (e.g., `Pets`, 2.43) 
+from dominating the first PCs, and removes the effect of the different ranges of the encoded categorical features (1–3 or 1–4 vs 1–5).
+
+**Cons.** Low-variance features are amplified together with their noise: in `Music`, 
+where most people answered 5, a rare answer of 1 becomes −6.03. The information carried by the original variances 
+(which questions split people the most) is lost, and since the total variance is spread evenly, 
+more PCs are needed to reach the same share of it.
